@@ -53,15 +53,6 @@ define postgresql::server::instance::initdb (
       mode    => '0700',
       seltype => $seltype,
     }
-  } else {
-    # changes an already defined datadir
-    File <| title == $datadir |> {
-      ensure  => directory,
-      owner   => $user,
-      group   => $group,
-      mode    => '0700',
-      seltype => $seltype,
-    }
   }
 
   if($xlogdir) {

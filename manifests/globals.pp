@@ -197,6 +197,7 @@ class postgresql::globals (
       'Debian' => $facts['os']['release']['major'] ? {
         '10'    => '11',
         '11'    => '13',
+        '12'    => '15',
         default => undef,
       },
       'Ubuntu' => $facts['os']['release']['major'] ? {

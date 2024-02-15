@@ -1,19 +1,23 @@
-# lint:ignore:140chars
 # @summary Manage the default encoding when database initialization is managed by the package
-# @param encoding Sets the default encoding for all databases created with this module. On certain operating systems this is also used during the template1 initialization, so it becomes a default outside of the module as well.
+#
+# @param encoding
+#   Sets the default encoding for all databases created with this module. On certain operating systems this is also used during the
+#   template1 initialization, so it becomes a default outside of the module as well.
 # @param user Overrides the default PostgreSQL super user and owner of PostgreSQL related files in the file system.
 # @param group Overrides the default postgres user group to be used for related files in the file system.
 # @param psql_path Specifies the path to the psql command.
-# @param port Specifies the port for the PostgreSQL server to listen on. Note: The same port number is used for all IP addresses the server listens on. Also, for Red Hat systems and early Debian systems, changing the port causes the server to come to a full stop before being able to make the change.
+# @param port
+#   Specifies the port for the PostgreSQL server to listen on.
+#   Note: The same port number is used for all IP addresses the server listens on. Also, for Red Hat systems and early Debian systems,
+#   changing the port causes the server to come to a full stop before being able to make the change.
 # @param module_workdir Working directory for the PostgreSQL module
-# lint:endignore:140chars
 define postgresql::server::instance::late_initdb (
   Optional[String[1]]                       $encoding       = $postgresql::server::encoding,
   String[1]                                 $user           = $postgresql::server::user,
   String[1]                                 $group          = $postgresql::server::group,
-  Variant[String[1], Stdlib::Absolutepath]  $psql_path      = $postgresql::server::psql_path,
-  Variant[String[1], Stdlib::Port, Integer] $port           = $postgresql::server::port,
-  String[1]                                 $module_workdir = $postgresql::server::module_workdir,
+  Stdlib::Absolutepath                      $psql_path      = $postgresql::server::psql_path,
+  Stdlib::Port                              $port           = $postgresql::server::port,
+  Stdlib::Absolutepath                      $module_workdir = $postgresql::server::module_workdir,
 ) {
   # Set the defaults for the postgresql_psql resource
   Postgresql_psql {
@@ -21,6 +25,7 @@ define postgresql::server::instance::late_initdb (
     psql_group => $group,
     psql_path  => $psql_path,
     port       => $port,
+    instance   => $name,
     cwd        => $module_workdir,
   }
 
@@ -38,6 +43,6 @@ define postgresql::server::instance::late_initdb (
       WHERE datname = 'template1'",
     unless  => "SELECT datname FROM pg_database WHERE
       datname = 'template1' AND encoding = pg_char_to_encoding('${encoding}')",
-    before  => Anchor['postgresql::server::service::end'],
+    before  => Anchor["postgresql::server::service::end::${name}"],
   }
 }

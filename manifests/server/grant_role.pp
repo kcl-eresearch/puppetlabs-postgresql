@@ -7,13 +7,15 @@
 # @param psql_user Sets the OS user to run psql.
 # @param port Port to use when connecting.
 # @param connect_settings Specifies a hash of environment variables used when connecting to a remote server.
+# @param instance The name of the Postgresql database instance.
 define postgresql::server::grant_role (
   String[1]                                 $group,
   String[1]                                 $role             = $name,
   Enum['present', 'absent']                 $ensure           = 'present',
+  String[1]                                 $instance         = 'main',
   String[1]                                 $psql_db          = $postgresql::server::default_database,
   String[1]                                 $psql_user        = $postgresql::server::user,
-  Variant[String[1], Stdlib::Port, Integer] $port             = $postgresql::server::port,
+  Stdlib::Port                              $port             = $postgresql::server::port,
   Hash                                      $connect_settings = $postgresql::server::default_connect_settings,
 ) {
   case $ensure {
@@ -32,14 +34,15 @@ define postgresql::server::grant_role (
 
   postgresql_psql { "grant_role:${name}":
     command          => $command,
-    unless           => "SELECT 1 WHERE EXISTS (SELECT 1 FROM pg_roles AS r_role JOIN pg_auth_members AS am ON r_role.oid = am.member JOIN pg_roles AS r_group ON r_group.oid = am.roleid WHERE r_group.rolname = '${group}' AND r_role.rolname = '${role}') ${unless_comp} true",
+    unless           => "SELECT 1 WHERE EXISTS (SELECT 1 FROM pg_roles AS r_role JOIN pg_auth_members AS am ON r_role.oid = am.member JOIN pg_roles AS r_group ON r_group.oid = am.roleid WHERE r_group.rolname = '${group}' AND r_role.rolname = '${role}') ${unless_comp} true", # lint:ignore:140chars
     db               => $psql_db,
     psql_user        => $psql_user,
     port             => $port,
+    instance         => $instance,
     connect_settings => $connect_settings,
   }
 
-  if ! $connect_settings or empty($connect_settings) {
+  if empty($connect_settings) {
     Class['postgresql::server'] -> Postgresql_psql["grant_role:${name}"]
   }
   if defined(Postgresql::Server::Role[$role]) {

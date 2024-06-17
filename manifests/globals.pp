@@ -81,6 +81,10 @@
 # @param timezone
 #   Sets the default timezone of the postgresql server. The postgresql built-in default is taking the systems timezone information.
 #
+# @param password_encryption
+#   Specify the type of encryption set for the password.
+#   Defaults to scram-sha-256 for PostgreSQL >= 14, otherwise md5.
+#
 # @param manage_pg_hba_conf Allow Puppet to manage the pg_hba.conf file.
 # @param manage_pg_ident_conf Allow Puppet to manage the pg_ident.conf file.
 # @param manage_recovery_conf Allow Puppet to manage the recovery.conf file.
@@ -159,6 +163,7 @@ class postgresql::globals (
   Optional[String[1]] $locale                      = undef,
   Optional[Boolean] $data_checksums                = undef,
   Optional[String[1]] $timezone                    = undef,
+  Optional[Postgresql::Pg_password_encryption] $password_encryption = undef,
 
   Optional[Boolean] $manage_pg_hba_conf            = undef,
   Optional[Boolean] $manage_pg_ident_conf          = undef,
@@ -175,7 +180,7 @@ class postgresql::globals (
   $default_version = $facts['os']['family'] ? {
     /^(RedHat|Linux)/ => $facts['os']['name'] ? {
       'Fedora' => $facts['os']['release']['major'] ? {
-        /^(38)$/       => '15',
+        /^(38|39)$/    => '15',
         /^(36|37)$/    => '14',
         /^(34|35)$/    => '13',
         /^(32|33)$/    => '12',
@@ -211,6 +216,7 @@ class postgresql::globals (
         /^(20.04)$/ => '12',
         /^(21.04|21.10)$/ => '13',
         /^(22.04)$/ => '14',
+        /^(24.04)$/ => '16',
         default => undef,
       },
       default => undef,
@@ -259,6 +265,7 @@ class postgresql::globals (
     '10'    => '2.4',
     '11'    => '3.0',
     '12'    => '3.0',
+    '16'    => '3.4',
     default => undef,
   }
   $globals_postgis_version = $postgis_version ? {

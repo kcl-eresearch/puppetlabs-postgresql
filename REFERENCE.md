@@ -208,6 +208,7 @@ The following parameters are available in the `postgresql::globals` class:
 * [`locale`](#-postgresql--globals--locale)
 * [`data_checksums`](#-postgresql--globals--data_checksums)
 * [`timezone`](#-postgresql--globals--timezone)
+* [`password_encryption`](#-postgresql--globals--password_encryption)
 * [`manage_pg_hba_conf`](#-postgresql--globals--manage_pg_hba_conf)
 * [`manage_pg_ident_conf`](#-postgresql--globals--manage_pg_ident_conf)
 * [`manage_recovery_conf`](#-postgresql--globals--manage_recovery_conf)
@@ -581,6 +582,15 @@ Default value: `undef`
 Data type: `Optional[String[1]]`
 
 Sets the default timezone of the postgresql server. The postgresql built-in default is taking the systems timezone information.
+
+Default value: `undef`
+
+##### <a name="-postgresql--globals--password_encryption"></a>`password_encryption`
+
+Data type: `Optional[Postgresql::Pg_password_encryption]`
+
+Specify the type of encryption set for the password.
+Defaults to scram-sha-256 for PostgreSQL >= 14, otherwise md5.
 
 Default value: `undef`
 
@@ -1536,6 +1546,7 @@ The following parameters are available in the `postgresql::server::config_entry`
 * [`value`](#-postgresql--server--config_entry--value)
 * [`path`](#-postgresql--server--config_entry--path)
 * [`comment`](#-postgresql--server--config_entry--comment)
+* [`instance_name`](#-postgresql--server--config_entry--instance_name)
 
 ##### <a name="-postgresql--server--config_entry--ensure"></a>`ensure`
 
@@ -1576,6 +1587,14 @@ Data type: `Optional[String[1]]`
 Defines the comment for the setting. The # is added by default.
 
 Default value: `undef`
+
+##### <a name="-postgresql--server--config_entry--instance_name"></a>`instance_name`
+
+Data type: `String[1]`
+
+The name of the instance.
+
+Default value: `'main'`
 
 ### <a name="postgresql--server--database"></a>`postgresql::server::database`
 
@@ -1738,6 +1757,7 @@ The following parameters are available in the `postgresql::server::database_gran
 * [`psql_group`](#-postgresql--server--database_grant--psql_group)
 * [`connect_settings`](#-postgresql--server--database_grant--connect_settings)
 * [`port`](#-postgresql--server--database_grant--port)
+* [`instance`](#-postgresql--server--database_grant--instance)
 
 ##### <a name="-postgresql--server--database_grant--privilege"></a>`privilege`
 
@@ -1804,6 +1824,14 @@ Data type: `Stdlib::Port`
 Port to use when connecting.
 
 Default value: `$postgresql::server::port`
+
+##### <a name="-postgresql--server--database_grant--instance"></a>`instance`
+
+Data type: `String[1]`
+
+The name of the Postgresql database instance.
+
+Default value: `'main'`
 
 ### <a name="postgresql--server--db"></a>`postgresql::server::db`
 
@@ -3960,6 +3988,7 @@ The following parameters are available in the `postgresql::server::table_grant` 
 * [`psql_user`](#-postgresql--server--table_grant--psql_user)
 * [`connect_settings`](#-postgresql--server--table_grant--connect_settings)
 * [`onlyif_exists`](#-postgresql--server--table_grant--onlyif_exists)
+* [`instance`](#-postgresql--server--table_grant--instance)
 
 ##### <a name="-postgresql--server--table_grant--privilege"></a>`privilege`
 
@@ -4038,6 +4067,14 @@ Data type: `Boolean`
 Create grant only if it doesn't exist.
 
 Default value: `false`
+
+##### <a name="-postgresql--server--table_grant--instance"></a>`instance`
+
+Data type: `String[1]`
+
+The name of the Postgresql database instance.
+
+Default value: `'main'`
 
 ### <a name="postgresql--server--tablespace"></a>`postgresql::server::tablespace`
 
